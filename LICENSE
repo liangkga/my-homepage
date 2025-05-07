@@ -1,0 +1,41 @@
+
+## 🚀 如何使用与定制
+
+1.  **获取代码**:
+    * 克隆此仓库: `git clone https://github.com/liangkga/my-homepage.git`
+    * 或直接下载 ZIP 文件。
+
+2.  **个性化内容**:
+    * 打开 `index.html` 文件。
+    * **替换占位符**: 搜索并替换所有 `[你的名字]`、`[你的职业/一句话简介]`、`[项目链接/代码仓库链接]`、`[你的邮箱]`、`[你的GitHub用户名]` 等占位符为你自己的真实信息。
+    * **更新图片**: 如果你使用了头像或项目图片，请将它们放入 `images` 文件夹，并在 HTML 的 `<img>` 标签中更新 `src` 路径。例如：`<img src="images/my-profile-photo.jpg" ...>`。
+        * 项目卡片中的占位符图片链接 (如 `https://via.placeholder.com/...`) 也应替换为你的项目实际截图。
+
+3.  **自定义背景**:
+    * 在 `index.html` 的 `<style>` 标签内，找到 `body` 样式下的 `/* --- 自定义背景区 --- */` 注释。
+    * **图片背景**: 取消相关代码的注释，并将 `url('images/your-background-image.jpg')` 中的路径替换为你的背景图片。
+    * **渐变背景**: 修改 `background: linear-gradient(...)` 中的颜色值和角度来创建你喜欢的渐变。
+
+4.  **自定义主题颜色 (可选)**:
+    * 在 `<style>` 标签顶部，你可以找到 `:root` 选择器，其中定义了 CSS 变量，如 `--accent-color`, `--text-color-primary` 等。修改这些变量的值可以快速改变整个网站的主题颜色。
+
+## 部署
+
+最简单的方式是使用 [GitHub Pages](https://pages.github.com/)：
+
+1.  确保你的仓库名为 `[你的GitHub用户名].github.io` (用于用户/组织站点) 或者一个普通名称 (用于项目站点)。
+2.  将你的 `index.html` (以及 `images` 文件夹, `README.md`, `LICENSE`) 推送到 GitHub 仓库的 `main` (或 `master`) 分支。
+3.  在仓库的 "Settings" -> "Pages" 页面：
+    * **Source**: 选择 "Deploy from a branch"。
+    * **Branch**: 选择 `main` (或 `master`) 以及 `/ (root)` 文件夹。
+4.  保存后，你的个人主页将在几分钟内上线，地址通常是 `https://[你的GitHub用户名].github.io/` (用户站点) 或 `https://[你的GitHub用户名].github.io/[你的仓库名称]/` (项目站点)。
+
+## 🤝 贡献
+
+这是一个个人项目模板，欢迎你 Fork 并根据自己的需求进行修改和使用。
+
+如果你发现任何 bug 或有改进建议，可以提出 Issue。
+
+## 📜 许可证
+
+此项目使用 [MIT License](./LICENSE) 授权。

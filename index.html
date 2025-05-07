@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人主页 - [你的名字]</title>
+    <meta name="description" content="[你的名字]的个人网站，展示我的技能、项目和经验。">
+
+    <style>
+        /* --- 1. 全局与自定义背景 (与上一版基本一致) --- */
+        :root {
+            --accent-color: #007aff;
+            --text-color-primary: #1d1d1f;
+            --text-color-secondary: #6e6e73;
+            --background-color-main: #f5f5f7;
+            --card-background-color: rgba(255, 255, 255, 0.85); /* 毛玻璃背景透明度微调 */
+            --card-background-solid: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.65;
+            color: var(--text-color-primary);
+            background: linear-gradient(135deg, #f0f2f5 0%, #e6e9ed 100%);
+            /* --- 自定义背景区 (如需图片背景，取消注释并替换) --- */
+            /*
+            background-image: url('images/your-background-image.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            */
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden; /* 防止水平滚动条因动画产生 */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: auto;
+            padding: 0 20px;
+        }
+
+        /* --- 动画效果 --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn { /* 用于技能卡片等 */
+            from {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* 用于JS触发滚动动画的基础类 */
+        .animate-on-scroll {
+            opacity: 0; /* 初始不可见 */
+            will-change: opacity, transform; /* 提升动画性能 */
+        }
+
+        /* 动画触发后的样式 */
+        .animate-on-scroll.is-visible.fade-in-up {
+            animation: fadeInUp 0.7s ease-out forwards;
+        }
+        .animate-on-scroll.is-visible.fade-in {
+            animation: fadeIn 0.7s ease-out forwards;
+        }
+        .animate-on-scroll.is-visible.scale-in {
+            animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* 带一点回弹效果 */
+        }
+        .animate-on-scroll.is-visible.slide-in-left {
+            animation: slideInLeft 0.7s ease-out forwards;
+        }
+
+
+        /* --- 2. 头部与导航 (毛玻璃效果) --- */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+            width: 100%;
+            background-color: rgba(248, 248, 250, 0.75); /* 调整透明度 */
+            backdrop-filter: blur(15px) saturate(180%); /* 增强模糊 */
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            box-shadow: 0 1px 2px var(--shadow-color);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        header nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .logo {
+            color: var(--text-color-primary);
+            text-decoration: none;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        header .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        header .nav-links li {
+            margin-left: 25px;
+        }
+
+        header .nav-links a {
+            color: var(--text-color-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s ease-in-out;
+            position: relative; /* 为了下划线动画 */
+            padding-bottom: 6px; /* 为下划线留出空间 */
+        }
+        /* 下划线动画 */
+        header .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%; /* 从中间开始 */
+            transform: translateX(-50%); /* 居中 */
+            width: 0; /* 初始宽度为0 */
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 平滑过渡 */
+        }
+
+        header .nav-links a:hover::after,
+        header .nav-links a.active-link::after {
+            width: 100%; /* 展开到100%宽度 */
+        }
+
+        header .nav-links a:hover,
+        header .nav-links a.active-link {
+            color: var(--accent-color);
+        }
+
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background-color: var(--text-color-primary);
+            margin: 5px 0;
+            transition: all 0.3s ease-in-out;
+            border-radius: 1px;
+        }
+
+        /* --- 3. Hero Section (带加载动画) --- */
+        .hero-section {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 5rem 20px;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+            border-radius: 20px;
+            background-color: var(--card-background-solid);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        /* Hero 元素加载动画的初始状态 */
+        #hero-title, #hero-subtitle, #hero-cta {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        /* Hero 元素加载动画触发后的状态 (由JS添加 .is-visible) */
+        #hero-title.is-visible { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+        #hero-subtitle.is-visible { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+        #hero-cta.is-visible { opacity: 1; transform: translateY(0); transition-delay: 0.5s; }
+
+
+        .hero-section h1 { /* HTML中对应id="hero-title" */
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-color-primary);
+            font-weight: 600;
+        }
+
+        .hero-section p { /* HTML中对应id="hero-subtitle" */
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: var(--text-color-secondary);
+            max-width: 600px;
+            font-weight: 400;
+        }
+
+        .cta-button { /* HTML中对应id="hero-cta" */
+            display: inline-block;
+            background: var(--accent-color);
+            color: #fff;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: transform 0.2s ease-out, background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.2);
+        }
+
+        .cta-button:hover {
+            background-color: #006ae6;
+            transform: translateY(-3px) scale(1.03); /* 悬停动画增强 */
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.3);
+        }
+
+        .profile-photo {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-top: 2.5rem;
+            border: 4px solid var(--card-background-solid);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            /* 可以给头像也加个滚动动画 */
+            /* class="animate-on-scroll scale-in" */
+        }
+
+        /* --- 4. 内容区域与卡片 (带滚动动画) --- */
+        .content-section {
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+            background-color: transparent;
+        }
+        
+        .content-section.section-block {
+            background-color: var(--card-background-solid);
+            padding: 3rem 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .content-section h2 { /* Section 标题滚动动画 */
+            text-align: center;
+            margin-bottom: 2.5rem;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--text-color-primary);
+        }
+
+        /* 关于我段落动画 */
+        #about p { /* 如果只有一个p，直接用。多个则需要分别加class */
+             /* class="animate-on-scroll fade-in-up" */
+        }
+
+
+        /* 技能列表 (带滚动和交错动画) */
+        .skills-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .skills-list li {
+            background: rgba(225, 225, 230, 0.7);
+            color: var(--text-color-secondary);
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease, opacity 0.5s ease-out, transform 0.5s ease-out; /* 为JS交错动画准备 */
+            border: 1px solid rgba(0,0,0,0.05);
+            /* class="animate-on-scroll scale-in" (由JS交错应用) */
+        }
+
+        .skills-list li:hover {
+            background: var(--accent-color);
+            color: #fff;
+            transform: translateY(-3px) scale(1.05); /* 悬浮效果增强 */
+        }
+
+        /* 项目网格 (带滚动和交错动画) */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .project-card {
+            background: var(--card-background-color);
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.6s ease-out, transform 0.6s ease-out; /* 为JS交错动画准备 */
+            overflow: hidden;
+            /* class="animate-on-scroll fade-in-up" (由JS交错应用) */
+        }
+
+        .project-card:hover {
+            transform: translateY(-6px) scale(1.03); /* 悬浮效果增强 */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .project-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.4s ease; /* 图片悬停放大 */
+        }
+        .project-card:hover img {
+            transform: scale(1.05); /* 图片放大效果 */
+        }
+
+        .project-card h3 {
+            margin-bottom: 0.75rem;
+            color: var(--text-color-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .project-card p {
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            color: var(--text-color-secondary);
+            min-height: 50px;
+        }
+
+        .project-card a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .project-card a:hover {
+            color: #005bb5;
+            text-decoration: underline;
+        }
+
+        /* 联系方式 */
+        #contact ul { /* class="animate-on-scroll fade-in" */
+            list-style: none;
+            text-align: center;
+        }
+        #contact li { /* 可单独给每个li加动画 */
+            margin-bottom: 1rem;
+        }
+        #contact a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: letter-spacing 0.3s ease; /* 文字间距动画 */
+        }
+        #contact a:hover {
+            text-decoration: underline;
+            letter-spacing: 0.5px; /* 轻微增加文字间距 */
+        }
+
+
+        /* --- 5. 页脚 --- */
+        footer { /* class="animate-on-scroll fade-in" */
+            text-align: center;
+            padding: 2.5rem 0;
+            margin-top: 2rem;
+            background: transparent;
+            color: var(--text-color-secondary);
+            font-size: 0.85rem;
+        }
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- 6. 响应式设计 (与上一版基本一致，略作调整) --- */
+        @media (max-width: 768px) {
+            header {
+                padding: 0.8rem 0;
+                background-color: rgba(250, 250, 252, 0.88); /* 增强背景不透明度 */
+            }
+            header nav {
+                flex-direction: column;
+                align-items: flex-start;
+                position: relative;
+            }
+            header .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+                background-color: rgba(248, 248, 250, 0.98); /* 增强背景不透明度 */
+                backdrop-filter: blur(10px) saturate(180%);
+                -webkit-backdrop-filter: blur(10px) saturate(180%);
+                border-radius: 8px;
+                padding: 10px 0;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                position: absolute; /* 让其在logo下方展开 */
+                top: 100%;
+                left:0;
+            }
+            header .nav-links.active { display: flex; }
+            header .nav-links li { margin: 0; width: 100%; text-align: left; }
+            header .nav-links li a { display: block; padding: 12px 20px; color: var(--text-color-primary); font-weight: 500; }
+            header .nav-links li a::after { bottom: 8px; height: 2px; } /* 调整下划线位置 */
+            header .nav-links li a:hover { background-color: rgba(0, 122, 255, 0.05); color: var(--accent-color); }
+            .menu-toggle { display: block; position: absolute; top: calc(50% - 0.25rem); right: 0px; transform: translateY(-50%); }
+            
+            .hero-section { padding: 3rem 15px; min-height: 50vh; }
+            .hero-section h1 { font-size: 2.2rem; }
+            .hero-section p { font-size: 1.1rem; }
+            .cta-button { padding: 12px 28px; font-size: 0.95rem; }
+            .content-section h2 { font-size: 1.8rem; }
+            .project-grid { grid-template-columns: 1fr; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">[你的名字]</a>
+            <ul class="nav-links">
+                <li><a href="#hero" class="active-link">首页</a></li>
+                <li><a href="#about">关于我</a></li>
+                <li><a href="#skills">技能</a></li>
+                <li><a href="#projects">项目</a></li>
+                <li><a href="#contact">联系我</a></li>
+            </ul>
+            <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section container">
+            <h1 id="hero-title">[你的名字]</h1>
+            <p id="hero-subtitle">[你的职业/一句话简介]</p>
+            <a href="#projects" class="cta-button" id="hero-cta">浏览我的作品集</a>
+            <img src="https://via.placeholder.com/160x160/ddeeff/007aff?text=头像" alt="[你的名字]" class="profile-photo animate-on-scroll scale-in"> </section>
+
+        <section id="about" class="container content-section section-block">
+            <h2 class="animate-on-scroll fade-in-up">关于我</h2>
+            <p class="animate-on-scroll fade-in-up">[介绍你自己...]</p>
+            <p class="animate-on-scroll fade-in-up" style="animation-delay: 0.1s;">[更多介绍，可以加style="animation-delay: 0.Xs;"实现基础的交错]</p>
+        </section>
+
+        <section id="skills" class="container content-section section-block">
+            <h2 class="animate-on-scroll fade-in-up">我的技能栈</h2>
+            <ul class="skills-list">
+                <li>HTML5</li>
+                <li>CSS3 (Flexbox, Grid)</li>
+                <li>JavaScript (ES6+)</li>
+                <li>Vue.js</li>
+                <li>React</li>
+                <li>Node.js</li>
+                <li>Git & GitHub</li>
+                <li>UI/UX Design Principles</li>
+                <li>[其他技能...]</li>
+            </ul>
+        </section>
+
+        <section id="projects" class="container content-section">
+            <h2 class="animate-on-scroll fade-in-up">精选项目</h2>
+            <div class="project-grid">
+                <article class="project-card">
+                    <img src="https://via.placeholder.com/400x250/ddeeff/007aff?text=项目截图+1" alt="项目1截图">
+                    <h3>项目名称 A</h3>
+                    <p>[项目简介]</p>
+                    <a href="#" target="_blank" rel="noopener noreferrer">查看详情 &rarr;</a>
+                </article>
+                <article class="project-card">
+                    <img src="https://via.placeholder.com/400x250/eefdeed/007aff?text=项目截图+2" alt="项目2截图">
+                    <h3>项目名称 B</h3>
+                    <p>[项目简介]</p>
+                    <a href="#" target="_blank" rel="noopener noreferrer">查看详情 &rarr;</a>
+                </article>
+                <article class="project-card">
+                    <img src="https://via.placeholder.com/400x250/eff7de/007aff?text=项目截图+3" alt="项目3截图">
+                    <h3>项目名称 C</h3>
+                    <p>[项目简介]</p>
+                    <a href="#" target="_blank" rel="noopener noreferrer">查看详情 &rarr;</a>
+                </article>
+            </div>
+        </section>
+
+        <section id="contact" class="container content-section section-block">
+            <h2 class="animate-on-scroll fade-in-up">与我联系</h2>
+            <p class="animate-on-scroll fade-in-up" style="text-align:center; margin-bottom:1.5rem;">期待与你交流！</p>
+            <ul class="animate-on-scroll fade-in"> <li>邮箱: <a href="mailto:[你的邮箱]">[你的邮箱]</a></li>
+                <li>GitHub: <a href="https://github.com/[你的GitHub用户名]" target="_blank" rel="noopener noreferrer">@[你的GitHub用户名]</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="container animate-on-scroll fade-in">
+        <p>&copy; <span id="current-year"></span> [你的名字]. 保留所有权利.</p>
+        <p>以热爱驱动，用代码构建。托管于 <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. 自动更新页脚年份
+            const currentYearSpan = document.getElementById('current-year');
+            if (currentYearSpan) {
+                currentYearSpan.textContent = new Date().getFullYear();
+            }
+
+            // 2. 移动端导航菜单切换
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    const isExpanded = navLinks.classList.contains('active');
+                    menuToggle.setAttribute('aria-expanded', isExpanded);
+                    const spans = menuToggle.querySelectorAll('span');
+                    if (isExpanded) {
+                        spans[0].style.transform = 'rotate(45deg) translate(4px, 5px)';
+                        spans[1].style.opacity = '0';
+                        spans[2].style.transform = 'rotate(-45deg) translate(4px, -5px)';
+                    } else {
+                        spans[0].style.transform = '';
+                        spans[1].style.opacity = '1';
+                        spans[2].style.transform = '';
+                    }
+                });
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (navLinks.classList.contains('active')) {
+                            navLinks.classList.remove('active');
+                            menuToggle.setAttribute('aria-expanded', 'false');
+                            const spans = menuToggle.querySelectorAll('span');
+                            spans[0].style.transform = '';
+                            spans[1].style.opacity = '1';
+                            spans[2].style.transform = '';
+                        }
+                        navLinks.querySelectorAll('a').forEach(navA => navA.classList.remove('active-link'));
+                        link.classList.add('active-link');
+                    });
+                });
+            }
+
+            // 3. Hero Section 加载动画触发
+            const heroTitle = document.getElementById('hero-title');
+            const heroSubtitle = document.getElementById('hero-subtitle');
+            const heroCta = document.getElementById('hero-cta');
+            // 使用一个小的延时确保页面结构稳定后再添加is-visible，或者直接在CSS中定义动画延迟
+            setTimeout(() => {
+                if(heroTitle) heroTitle.classList.add('is-visible');
+                if(heroSubtitle) heroSubtitle.classList.add('is-visible');
+                if(heroCta) heroCta.classList.add('is-visible');
+            }, 100); // 100ms 延迟
+
+
+            // 4. 滚动触发动画 (Intersection Observer)
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            const skillsItems = document.querySelectorAll('.skills-list li');
+            const projectCards = document.querySelectorAll('.project-card');
+
+            const observerOptions = {
+                root: null, // 默认视口
+                rootMargin: '0px',
+                threshold: 0.1 // 元素10%可见时触发
+            };
+
+            const observerCallback = (entries, observerInstance) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observerInstance.unobserve(entry.target); // 动画只播放一次
+                    }
+                });
+            };
+            
+            const observer = new IntersectionObserver(observerCallback, observerOptions);
+            animatedElements.forEach(el => observer.observe(el));
+
+            // 4.1 为技能列表和项目卡片添加基础动画类和交错效果
+            // 技能列表交错动画
+            skillsItems.forEach((item, index) => {
+                item.classList.add('animate-on-scroll', 'scale-in'); // 添加动画基础类
+                item.style.animationDelay = `${index * 0.07}s`; // CSS动画的延迟
+                observer.observe(item); // 确保它们也被观察
+            });
+
+            // 项目卡片交错动画
+            projectCards.forEach((card, index) => {
+                card.classList.add('animate-on-scroll', 'fade-in-up'); // 添加动画基础类
+                card.style.animationDelay = `${index * 0.12}s`; // CSS动画的延迟
+                observer.observe(card); // 确保它们也被观察
+            });
+
+
+            // 5. 滚动时更新导航链接高亮 (与上一版一致)
+            const sections = document.querySelectorAll('main section[id]');
+            function updateActiveLink() {
+                let index = sections.length;
+                // 调整偏移量，使导航高亮更及时或提前一点
+                const scrollYWithOffset = window.scrollY + window.innerHeight / 2.5; 
+                while(--index && scrollYWithOffset < sections[index].offsetTop) {} 
+                
+                navLinks.querySelectorAll('a').forEach((link) => link.classList.remove('active-link'));
+                const activeNavElement = sections[index];
+                if (activeNavElement) { // 确保 activeNavElement 不是 undefined
+                    const activeLink = navLinks.querySelector('a[href="#'+activeNavElement.id+'"]');
+                    if (activeLink) {
+                        activeLink.classList.add('active-link');
+                    }
+                } else if (window.scrollY < sections[0].offsetTop) { // 如果滚动到最顶部，高亮第一个
+                     const firstLink = navLinks.querySelector('a[href="#'+sections[0].id+'"]');
+                     if(firstLink) firstLink.classList.add('active-link');
+                }
+            }
+            if (sections.length > 0) { // 确保页面上有 sections
+                 updateActiveLink();
+                 window.addEventListener('scroll', updateActiveLink);
+            }
+        });
+    </script>
+</body>
+</html>
